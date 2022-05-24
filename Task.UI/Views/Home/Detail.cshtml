@@ -1,0 +1,145 @@
+﻿
+<h2>@ViewBag.Title</h2>
+
+
+<div class="container">
+    <div class="col-sm-3 nopadding">
+        <div class="form-group">
+            <input type="text" class="form-control" id="FirstName" name="FirstName" value="">
+        </div>
+    </div>
+    <div class="col-sm-3 nopadding">
+        <div class="form-group">
+            <input type="text" class="form-control" id="LastName" name="LastName" value="">
+        </div>
+    </div>
+    <div class="col-sm-3 nopadding">
+        <div class="form-group">
+            <input type="text" class="form-control" id="EmailId" name="EmailId" value="">
+        </div>
+    </div>
+    <div class="col-sm-3 nopadding">
+        <div class="form-group">
+            <input type="text" class="form-control" id="Address" name="Address" value="">
+        </div>
+    </div>
+    <button class="btn btn-success" type="button" onclick="update();"> Update  </button>
+
+    <div class="panel-body">
+
+        <div class="transaction">
+        </div>
+        <div class="input-group-btn">
+            <button class="btn btn-success" type="button" onclick="fields();"> <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Experience </button>
+        </div>
+        <div id="fields">
+            <div class="clear"></div>
+
+        </div>
+    </div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            loadData();
+        });
+        function loadData() {
+            $('.user').html("");
+            $.ajax({
+                url: "http://localhost:54263/api/users/@ViewBag.id", xhrFields: {
+                    withCredentials: true
+                },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json", headers: [" Access-Control-Allow-Origin:*"],
+                success: function (item) {
+                    var html = ''
+                     $.each(item.Transactions, function (key, i) {
+                        html += '<tr>';
+                        html += '     <td> ' + i.Id + '</td > ';
+                        html += '<td> ' + i.FirstName + '</td > ';
+                        html += '<td> ' + i.LastName + '</td > ';
+                        html += '<td> ' + i.EmailId + '</td > ';
+                        html += '<td> ' + i.Address + '</td > ';
+                        html += '</tr > ';
+                    });
+
+                    $('#FirstName').val(item.FirstName );
+                    $('#LastName').val(item.LastName );
+                    $('#Address').val(item.Address );
+                    $('#EmailId').val(item.EmailId);
+                    $('.user').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+              $.ajax({
+                url: "http://localhost:54263/api/transactions/@ViewBag.id", xhrFields: {
+                    withCredentials: true
+                },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json", headers: [" Access-Control-Allow-Origin:*"],
+                success: function (item) {
+                    var html = ''
+                     $.each(item, function (key, i) {
+                         html += '<div class="col-sm-3 nopadding"><div class="form-group"> <input type="text" class="form-control" id="Position" name="Position[]" value="' + i.Position + '" placeholder="Position"></div></div><div class="col-sm-3 nopadding"><div class="form-group"> <input type="text" class="form-control" id="FromDate" name="FromDate[] "value="' + i.FromDate +'" placeholder="FromDate"></div></div><div class="col-sm-3 nopadding"><div class="form-group"> <input type="text" class="form-control" id="ToDate" name="ToDate[]" value="'+i.ToDate+'" placeholder="To Date"></div></div><div class="col-sm-3 nopadding"><div class="form-group"><div class="input-group"> <div class="input-group-btn"> <button class="btn btn-danger" type="button" onclick="remove_fields(' + room + ');"> <span class="glyphicon glyphicon-minus" aria-hidden="true"></span> </button></div></div></div></div><div class="clear"></div>';
+
+                    });
+                    $('.transaction').html(html);
+                      
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        var room = 1;
+        function fields() {
+
+            room++;
+            var objTo = document.getElementById('fields')
+            var divtest = document.createElement("div");
+            divtest.setAttribute("class", "form-group removeclass" + room);
+            var rdiv = 'removeclass' + room;
+            divtest.innerHTML = '<div class="col-sm-3 nopadding"><div class="form-group"> <input type="text" class="form-control" id="CompanyName' + room + '" name="CompanyName[]" value="" placeholder="Company Name"></div></div><div class="col-sm-3 nopadding"><div class="form-group"> <input type="text" class="form-control" id="Position' + room + '" name="Position[]" value="" placeholder="Position"></div></div><div class="col-sm-3 nopadding"><div class="form-group"> <input type="date" class="form-control" id="FromDate' + room + '" name="FromDate[]" value="" placeholder="FromDate"></div></div><div class="col-sm-3 nopadding"><div class="form-group"> <input type="date" class="form-control" id="ToDate' + room +'" name="ToDate[]" value="" placeholder="To Date"></div></div><div class="col-sm-3 nopadding"><div class="form-group"><div class="input-group"> <div class="input-group-btn"> <button class="btn btn-success" type="button" onclick="update(' + room + ');"> Update </button></div></div></div></div><div class="clear"></div>';
+
+            objTo.appendChild(divtest)
+        }
+        function remove_fields(rid) {
+            $('.removeclass' + rid).remove();
+        }
+
+        function update(id) { 
+            
+            var Obj = {
+                CompanyName: $('#CompanyName' + id).val(),
+                Position: $('#Position'+id).val(),
+                FromDate: $('#FromDate' + id).val(),
+                ToDate: $('#ToDate' + id).val(),
+                UserId: @ViewBag.id,
+            };
+            $.ajax({
+                url: "http://localhost:54263/api/transactions/", xhrFields: {
+                    withCredentials: true
+                },
+                data: JSON.stringify(Obj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+
+
+    </script>
+}

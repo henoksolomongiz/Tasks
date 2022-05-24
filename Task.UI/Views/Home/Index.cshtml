@@ -1,0 +1,84 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="container">
+    <h2>User</h2>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    First Name
+                </th>
+                <th>
+                    Last Name
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Address
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody class="tbody">
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            loadData();
+        }); 
+        function loadData() {
+            $.ajax({
+                url: "http://localhost:54263/api/users", xhrFields: {
+                    withCredentials: true
+                },
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json", headers: [" Access-Control-Allow-Origin:*"],
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '     <td> ' + item.Id + '</td > ';
+                        html += '<td> ' + item.FirstName + '</td > ';
+                        html += '<td> ' + item.LastName + '</td > ';
+                        html += '<td> ' + item.EmailId + '</td > ';
+                        html += '<td> ' + item.Address + '</td > ';
+                        html += '<td> <a href="home/detail/' + item.Id +' ">View</a> </td > ';
+                        html += '</tr > ';
+                    });
+                    $('.tbody').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+      
+
+    </script>
+    }
